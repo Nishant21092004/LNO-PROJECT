@@ -27,7 +27,7 @@ def plot_gantt_chart(
     fig, ax = plt.subplots(figsize=(12, max(4, num_machines * 0.8)), dpi=150)
 
     # Distinct color palette per job
-    cmap = plt.cm.get_cmap("tab20" if schedule.instance.num_jobs > 10 else "tab10")
+    cmap = plt.get_cmap("tab20" if schedule.instance.num_jobs > 10 else "tab10")
     job_colors = {j: cmap(j % 20) for j in range(schedule.instance.num_jobs)}
 
     # Plot operations
