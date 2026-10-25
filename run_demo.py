@@ -20,6 +20,7 @@ from src.ga import run_genetic_algorithm
 from src.disruption import BreakdownDisruption, apply_right_shift, partition_disrupted_state
 from src.nsga2 import run_nsga2
 from src.visualize import plot_gantt_chart, plot_pareto_front
+from src.comparison import save_comparison
 
 
 def main():
@@ -176,6 +177,33 @@ def main():
         elif i == best_stab_idx:
             label += " (Min Instability)"
         table_data.append([label, ms, tar, instab, f"{nsga2_time:.2f} s (front)"])
+
+    # Optional post-processing: preserve all original demo steps and plots.
+    # Report only representative NSGA-II solutions to keep the comparison legible.
+    comparisons = [
+        {"algorithm": "FCFS", "phase": "pre", "makespan": sched_fcfs.makespan,
+         "tardiness": sched_fcfs.total_tardiness, "instability": "",
+         "runtime_s": round(fcfs_time, 6)},
+        {"algorithm": "SPT", "phase": "pre", "makespan": sched_spt.makespan,
+         "tardiness": sched_spt.total_tardiness, "instability": "",
+         "runtime_s": round(spt_time, 6)},
+        {"algorithm": "GA", "phase": "pre", "makespan": initial_ga_sched.makespan,
+         "tardiness": initial_ga_sched.total_tardiness, "instability": "",
+         "runtime_s": round(ga_time, 6)},
+        {"algorithm": "Right-Shift", "phase": "post", "makespan": sched_right_shift.makespan,
+         "tardiness": sched_right_shift.total_tardiness, "instability": rs_instability,
+         "runtime_s": round(rs_time, 6)},
+    ]
+    for label, idx in [("NSGA-II min time", 0), ("NSGA-II min instability", best_stab_idx)]:
+        comparisons.append({
+            "algorithm": label, "phase": "post",
+            "makespan": int(pareto_objs[idx, 0]),
+            "tardiness": int(pareto_objs[idx, 1]),
+            "instability": int(pareto_objs[idx, 2]),
+            "runtime_s": round(nsga2_time, 6),
+        })
+    save_comparison(comparisons)
+    print("    -> Saved comparison CSV and charts 06/07 to results/")
 
     import sys
     try:

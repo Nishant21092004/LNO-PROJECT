@@ -64,3 +64,28 @@ Outputs aggregated comparative metrics to `results/experiment_summary_ft06.csv`.
 | **NSGA-II (Min Instability)** | Post-Disruption (Multi-Obj) | **65** | **51** | **99** | 5.67 s (front) |
 
 > **Key Research Finding**: When Machine 2 breaks down for 15 time units, simple Right-Shift rescheduling inflates makespan to 68 and tardiness to 75. NSGA-II discovers non-dominated schedules that recover makespan back down to 61 and tardiness down to 48 while keeping shop floor instability under controlled limits.
+
+
+## Evaluation-friendly comparison charts and tests
+
+The original `python run_demo.py` still produces the five existing figures.
+It now additionally generates `results/06_algorithm_comparison.png`,
+`results/07_post_disruption_comparison.png` and `results/comparison_summary.csv`.
+The first chart labels pre-disruption and post-disruption phases separately;
+**pre-disruption and post-disruption metrics are not a controlled head-to-head comparison**.
+Charts are generated from the live run (not hardcoded README values).
+
+Run basic regression tests with:
+
+```bash
+python -m pip install -r requirements.txt
+python -m pytest tests/ -v
+python run_demo.py
+```
+
+The tests cover chromosome counts, operation precedence, machine overlaps,
+hand-computed metrics, and simple right-shift disruption cases. They do not
+claim that the full dynamic schedule is formally verified. The breakdown
+model treats an interrupted operation as resume-after-repair; the current
+Gantt representation uses single start/end rectangles, so uninterrupted
+processing should not be inferred from an interrupted block's drawing.
